@@ -2,7 +2,7 @@ import pandas as pd
 from ipaddress import IPv6Network
 
 # Leer el archivo filtrado
-data = pd.read_csv('example.txt', sep='|', header=None)
+data = pd.read_csv('datos_rib.txt', sep='|', header=None)
 
 # Filtrar solo prefijos IPv6
 data_ipv6 = data[data[5].str.contains(':')].copy()
