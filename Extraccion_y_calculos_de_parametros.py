@@ -27,7 +27,7 @@ def sumarizar_prefijos(prefijos):
     i = 0
     while i < len(redes):
         red_actual = redes[i]
-        # Sumarizar con el siguiente prefijo si son contiguos haciendo uso de la funcion que verifica que lo son.
+        # Sumarizar con el siguiente prefijo de manera que se comparen todos los prefijos si es que  son contiguos, haciendo uso de la funcion que verifica que lo son.
         while i + 1 < len(redes) and son_contiguos(red_actual, redes[i + 1]):
             red_actual = IPv6Network(f"{red_actual.network_address}/{red_actual.prefixlen}")
             i += 1
