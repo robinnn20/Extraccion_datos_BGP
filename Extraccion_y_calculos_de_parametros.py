@@ -16,7 +16,7 @@ from ipaddress import IPv6Network
 #13- Agregador: Informaci´on adicional sobre el agregador.
 
 # Se hace uso de la funcion de pandas para filtrar por columnas los datos tabulados separadas por "|"
-data = pd.read_csv('example.txt', sep='|', header=None)
+data = pd.read_csv('datos_rib.txt', sep='|', header=None)
 
 # Filtrar solo prefijos IPv6 en base a un caracter :
 data_ipv6 = data[data[5].str.contains(':')].copy()
