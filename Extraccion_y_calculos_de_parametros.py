@@ -1,21 +1,22 @@
 import pandas as pd
 from ipaddress import IPv6Network
 
-# Leer el archivo filtrado
+# Se hace uso de la funcion de pandas para filtrar por columnas los datos tabulados separadas por "|"
 data = pd.read_csv('example.txt', sep='|', header=None)
 
-# Filtrar solo prefijos IPv6 (se hace en la columna 5)
+# Filtrar solo prefijos IPv6 en base a un caracter :
 data_ipv6 = data[data[5].str.contains(':')].copy()
 
-# El total de prefijos IPv6 únicos en la columna 5
+# Nos aseguramos que el total de prefijos IPv6 sea único en la columna 5
 total_prefijos_ipv6 = data_ipv6[5].nunique()
 print(f"Total de prefijos IPv6 únicos: {total_prefijos_ipv6}")
 
 # Función para verificar si dos prefijos IPv6 pueden ser agregados
 def son_agregables(red1, red2):
-    """
-    Verifica si dos prefijos IPv6 pueden ser agregados en uno más grande.
-    """
+
+    #La función asegura que los prefijos sean sumarizables verificando que:
+     #Cubran la misma cantidad de direcciones (misma longitud).
+     #Sean adyacentes sin solapamiento ni espacios entre ellos.
     return red1.prefixlen == red2.prefixlen and (red1.network_address + red1.num_addresses == red2.network_address)
 
 # Función para contar prefijos agregables y no agregables dentro de un grupo de ASN
@@ -54,7 +55,7 @@ agregables_y_no_agregables_por_asn = (
 
 # Obtener la suma total de prefijos agregables y no agregables
 total_agregables = agregables_y_no_agregables_por_asn.apply(lambda x: x[0]).sum()
-total_no_agregables = agregables_y_no_agregables_por_asn.apply(lambda x: x[1]).sum()
+#total_no_agregables = agregables_y_no_agregables_por_asn.apply(lambda x: x[1]).sum()
 
 # Calcular los no agregables como la diferencia entre el total de prefijos y los agregables
 no_agregables_calculados = total_prefijos_ipv6 - total_agregables
@@ -63,7 +64,7 @@ print(f"Total de prefijos IPv6 únicos: {total_prefijos_ipv6}")
 print(f"Total de prefijos agregables: {total_agregables}")
 print(f"Total de prefijos no agregables (calculados): {no_agregables_calculados}")
 
-# AS-Path más largo y promedio
+# Se utiliza un espacio simple como caracer para identificar el aspath mas largo y su promedio
 data_ipv6['as_path_largo'] = data_ipv6[6].apply(lambda x: len(x.split(' ')))
 as_path_mas_largo = data_ipv6['as_path_largo'].max()
 as_path_promedio = data_ipv6['as_path_largo'].mean()
