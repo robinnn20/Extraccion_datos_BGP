@@ -19,15 +19,14 @@ def son_agregables(red1, red2):
      #Sean adyacentes sin solapamiento ni espacios entre ellos.
     return red1.prefixlen == red2.prefixlen and (red1.network_address + red1.num_addresses == red2.network_address)
 
-# Función para contar prefijos agregables y no agregables dentro de un grupo de ASN
+# Función para contar prefijos agregables y no agregables 
 def contar_agregables_y_no_agregables(grupo):
-    """
-    Calcula la cantidad de prefijos agregables y no agregables por ASN.
-    """
+   #se crea una lista o grupo de  prefijos para cada ASN
     prefijos = grupo.tolist()
     redes = [IPv6Network(p) for p in prefijos]  # Convertir prefijos a objetos IPv6Network
     redes.sort()  # Ordenar por dirección base y longitud
-
+    
+   #se declaran 2 contadores para prefijos agregables y no agregables
     agregables = 0
     no_agregables = 0
     i = 0
@@ -47,7 +46,7 @@ def contar_agregables_y_no_agregables(grupo):
 
     return agregables, no_agregables
 
-# Agrupar por ASN (columna 4) y calcular los prefijos agregables y no agregables
+# Agrupar por ASN (columna 4) y calcular los prefijos agregables y no agregables segun los propios prefijos anunciados en la columna 5
 agregables_y_no_agregables_por_asn = (
     data_ipv6.groupby(4)[5]
     .apply(contar_agregables_y_no_agregables)
