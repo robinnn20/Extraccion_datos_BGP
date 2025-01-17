@@ -1,5 +1,19 @@
 import pandas as pd
 from ipaddress import IPv6Network
+#0 -Type: Indica el formato.
+#1- Marca de tiempo: Momento de la entrada en formato epoch.
+#2 -W/A/B: Indica si se trata de una retirada (withdrawn), un anuncio (announcement) o una tabla de enrutamiento (routing table).
+#3- Peer IP: Direcci´on IP del monitor.
+#4 -Peer ASN: N´umero de Sistema Aut´onomo (ASN ) del monitor.
+#5- Prefijo: Bloque de direcciones IP anunciado
+#6- ASPath: Lista de AS atravesados para alcanzar el destino.
+#7- Protocolo de origen: Usualmente IGP.
+#8-Siguiente Hop: Direcci´on IP del siguiente salto.
+#9- LocalPref: Preferencia local asignada a la ruta.
+#10- MED: Discriminador de salida m´ultiple.
+#11-Cadenas comunitarias: Valores comunitarios asociados a la ruta.
+#12- Agregador at´omico: Indicador de rutas agregadas.
+#13- Agregador: Informaci´on adicional sobre el agregador.
 
 # Se hace uso de la funcion de pandas para filtrar por columnas los datos tabulados separadas por "|"
 data = pd.read_csv('example.txt', sep='|', header=None)
