@@ -1,5 +1,19 @@
 import pandas as pd
 import ipaddress
+#0 -Type: Indica el formato.
+#1- Marca de tiempo: Momento de la entrada en formato epoch.
+#2 -W/A/B: Indica si se trata de una retirada (withdrawn), un anuncio (announcement) o una tabla de enrutamiento (routing table).
+#3- Peer IP: Direcci´on IP del monitor.
+#4 -Peer ASN: N´umero de Sistema Aut´onomo (ASN ) del monitor.
+#5- Prefijo: Bloque de direcciones IP anunciado
+#6- ASPath: Lista de AS atravesados para alcanzar el destino.
+#7- Protocolo de origen: Usualmente IGP.
+#8-Siguiente Hop: Direcci´on IP del siguiente salto.
+#9- LocalPref: Preferencia local asignada a la ruta.
+#10- MED: Discriminador de salida m´ultiple.
+#11-Cadenas comunitarias: Valores comunitarios asociados a la ruta.
+#12- Agregador at´omico: Indicador de rutas agregadas.
+#13- Agregador: Informaci´on adicional sobre el agregador.
 
 # Verifica si dos prefijos IPv6 pueden ser agregados en un supernet
 def can_aggregate(network1, network2):
@@ -59,19 +73,19 @@ def analyze_ipv6_prefixes(file_path):
         # Contar los prefijos combinables
         max_agg_prefixes_count += len(combinable) * 2  # Cada combinación cuenta como 2 prefijos
 
-    print(f"El total de Maximum Aggregateable Prefixes es: {max_agg_prefixes_count}")
+    print(f"Maximum Aggregateable Prefixes: {max_agg_prefixes_count}")
 
     # Cálculo de prefijos no agregables
     non_agg_prefixes_count = total_prefijos - max_agg_prefixes_count
-    print(f"El total de prefijos no agregables es: {non_agg_prefixes_count}")
+    print(f"Unaggregateables Prefixes: {non_agg_prefixes_count}")
 
     # Cálculo de saltos del AS_PATH más largo y tamaño promedio de saltos
     df['as_path_length'] = df['as_path'].apply(lambda x: len(x.split()))  # Longitud del AS_PATH
     longest_as_path = df['as_path_length'].max()
     average_as_path_length = df['as_path_length'].mean()
 
-    print(f"El salto más largo en el AS_PATH es: {longest_as_path}")
-    print(f"El tamaño promedio de saltos en el AS_PATH es: {average_as_path_length:.2f}")
+    print(f"Longest AS-Path: {longest_as_path}")
+    print(f"Average AS-Path: {average_as_path_length:.2f}")
 
 # Ruta al archivo de entrada
 file_path = 'archivo_salida.txt'
