@@ -14,7 +14,7 @@ def can_aggregate(network1, network2):
 # Procesa el archivo de entrada para analizar prefijos IPv6
 def analyze_ipv6_prefixes(file_path):
     # Lee el archivo de entrada
-    df = pd.read_csv(file_path, delimiter='|', header=None, names=["as_path", "prefix"])
+    df = pd.read_csv(file_path, delimiter='|', header=None, names=["prefix", "as_path"])
 
     # Convierte los prefijos a objetos ip_network y organiza por AS de origen
     df['network'] = df['prefix'].apply(lambda x: ipaddress.ip_network(x.strip(), strict=False))
