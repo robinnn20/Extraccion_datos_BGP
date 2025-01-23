@@ -33,4 +33,4 @@ filtered_df = df[df['is_ipv6']].drop(columns=['is_ipv6'])
 # Guarda el resultado en un archivo de salida
 filtered_df.to_csv('datos_columnas_filtradas.txt', sep='|', index=False, header=False)
 
-print("El archivo de salida ha sido creado con los prefijos IPv6 únicos.")
+print("El archivo de salida ha sido creado con los prefijos IPv6 ")
