@@ -87,7 +87,9 @@ def analyze_ipv6_prefixes(file_path):
     non_agg_prefixes_count = total_prefijos - max_agg_prefixes_count
     print(f"Unaggregateables Prefixes: {non_agg_prefixes_count}")
 
-    # Cálculo de saltos del AS_PATH más largo y tamaño promedio de saltos
+    # Cálculo de saltos del AS_PATH más largo y tamaño promedio de saltos 
+    #x.split(): Divide la cadena en una lista de números (sistemas autónomos), usando espacios como separador.
+    #len(...): Cuenta cuántos elementos tiene la lista, que equivale a la cantidad de saltos en la ruta.
     df['as_path_length'] = df['as_path'].apply(lambda x: len(x.split()))  # Longitud del AS_PATH
     longest_as_path = df['as_path_length'].max()
     average_as_path_length = df['as_path_length'].mean()
