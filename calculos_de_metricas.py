@@ -15,7 +15,8 @@ class PatriciaTrie:
 #La función insert agrega una red (objeto network) a un Patricia Trie. Comienza desde el nodo raíz del trie y convierte la dirección de red (network_address) en una cadena binaria,
 #recortándola según la longitud del prefijo (prefixlen). Luego, recorre cada bit de esa cadena binaria,
 #creando nodos nuevos en el trie si no existen para ese bit.
-#Finalmente, cuando alcanza el final del prefijo, asigna el objeto network al nodo correspondiente, asociando la red con ese nodo del trie. Este proceso organiza las redes de manera eficiente, 
+#Finalmente, cuando alcanza el final del prefijo, asigna el objeto network al nodo correspondiente, asociando la red con ese nodo del trie.
+#Este proceso organiza las redes de manera eficiente, 
 #facilitando la búsqueda y almacenamiento de direcciones.
     def insert(self, network):
         #Se empieza desde el nodo raíz del trie, representado por self.root.
