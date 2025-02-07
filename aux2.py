@@ -56,11 +56,18 @@ class PatriciaTrie:
             node.is_aggregated = True
 
 
+def clean_as_path(as_path):
+    """Limpia el as_path de caracteres innecesarios como `{}`, `,`."""
+    # Remueve `{`, `}`, y `,` y separa el string en los AS individuales
+    cleaned = as_path.replace("{", "").replace("}", "").replace(",", " ").split()
+    return cleaned
+
 def analyze_ipv6_prefixes(file_path):
     # Carga el archivo y parsea los prefijos
     df = pd.read_csv(file_path, delimiter='|', header=None, names=["prefix", "as_path"])
     df['network'] = df['prefix'].apply(lambda x: ipaddress.ip_network(x.strip(), strict=False))
-    df['origin_as'] = df['as_path'].apply(lambda x: x.split()[-1])
+    # Limpia el AS path
+    df['origin_as'] = df['as_path'].apply(lambda x: clean_as_path(x)[-1])  # Último AS es el origen
 
     trie = PatriciaTrie()
     for network in df['network'].drop_duplicates():
@@ -103,7 +110,15 @@ def analyze_ipv6_prefixes(file_path):
     non_agg_prefixes_count = total_prefijos - max_agg_prefixes_count
     print(f"Unaggregateables Prefixes: {non_agg_prefixes_count}")
 
-    df['as_path_length'] = df['as_path'].apply(lambda x: len(x.split()))
+    # Calcular los prefijos totales anunciados (incluyendo repeticiones)
+    total_prefijos_anunciados = len(df)
+    print(f"Total de Prefijos Anunciados (con repeticiones): {total_prefijos_anunciados}")
+
+    # Cálculo del factor de desagregación
+    factor_desagregacion = total_prefijos / len(aggregated_networks) if len(aggregated_networks) else 0
+    print(f"Factor de desagregación: {factor_desagregacion:.2f}")
+
+    df['as_path_length'] = df['as_path'].apply(lambda x: len(clean_as_path(x)))
     longest_as_path = df['as_path_length'].max()
     average_as_path_length = df['as_path_length'].mean()
 
