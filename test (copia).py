@@ -64,7 +64,6 @@ async def is_asn_registered(asn):
     if asn in asn_cache:
         return asn_cache[asn]
 
-    # Usamos el semáforo para limitar el número de consultas concurrentes
     async with semaphore:
         try:
             process = await asyncio.create_subprocess_exec(
@@ -74,15 +73,13 @@ async def is_asn_registered(asn):
             )
             stdout, stderr = await process.communicate()
 
-            # Intentamos decodificar la salida en UTF-8, pero en caso de error usamos una codificación más permisiva
             try:
                 output = stdout.decode('utf-8')
             except UnicodeDecodeError:
                 output = stdout.decode('latin-1')
 
-            rir_keywords = ['ARIN', 'RIPE', 'APNIC', 'LACNIC', 'AFRINIC']
-
-            registered = any(keyword in output for keyword in rir_keywords)
+            keywords_unregistered = ['denied', 'Not match', 'Not found', 'ERROR', 'no entries found']
+            registered = not any(keyword in output for keyword in keywords_unregistered)
             asn_cache[asn] = registered
             return registered
 
@@ -115,7 +112,6 @@ async def analyze_ipv6_prefixes(file_path):
     max_agg_prefixes_count = 0
     aggregated_networks = set()
 
-    tasks = []
     for origin_as, group in grouped_as:
         networks = sorted(group['network'].drop_duplicates().tolist(), key=lambda x: (x.prefixlen, x.network_address))
         aggregated_in_as = set()
@@ -127,30 +123,24 @@ async def analyze_ipv6_prefixes(file_path):
 
             supernet_or_contiguous = trie.find_supernet_or_contiguous(network)
             if supernet_or_contiguous:
-                # Si el supernet o contiguo se encuentra, lo marca como agregado y no agrega más
                 max_agg_prefixes_count += 1
                 aggregated_in_as.add(network)
                 trie.mark_as_aggregated(network)
                 aggregated_in_as.add(supernet_or_contiguous)
 
-        # Después de procesar todos los prefijos en esta AS, agregamos solo los es decir los que ya no se pueden combinar mas
         for network in aggregated_in_as:
             if not any(other_network.prefixlen > network.prefixlen and other_network.network_address == network.network_address for other_network in aggregated_in_as):
                 aggregated_networks.add(network)
 
     print(f"Maximum Aggregateable Prefixes: {max_agg_prefixes_count}")
     print(f"Unaggregateables Prefixes: {total_prefijos - max_agg_prefixes_count}")
-
     print(f"Factor de desagregación: {total_prefijos / len(aggregated_networks) if aggregated_networks else 0:.2f}")
 
     df['as_path_length'] = df['as_path'].apply(lambda x: len(clean_as_path(x)))
     print(f"Longest AS-Path: {df['as_path_length'].max()}")
     print(f"Average AS-Path: {df['as_path_length'].mean():.2f}")
 
-
     print(f"Realizando consultas whois...")
-
-    # Consultar Whois en paralelo con los ASNs únicos
     unique_asns = list(df['origin_as'].drop_duplicates())
     tasks = [is_asn_registered(asn) for asn in unique_asns]
     results = await asyncio.gather(*tasks)
@@ -161,7 +151,7 @@ async def analyze_ipv6_prefixes(file_path):
             unregistered_asns[asn] = df[df['origin_as'] == asn]['prefix'].tolist()
 
     print(f"Total de ASNs no registrados: {len(unregistered_asns)}")
-    print(f"prefijos de ASNs no registrados: {sum(len(prefixes) for prefixes in unregistered_asns.values())}")
+    print(f"Prefijos de ASNs no registrados: {sum(len(prefixes) for prefixes in unregistered_asns.values())}")
 
 # Ejecutar el análisis asíncrono
 asyncio.run(analyze_ipv6_prefixes(FILE_PATH))
