@@ -151,6 +151,10 @@ async def analyze_ipv6_prefixes(file_path):
 
     print(f"Maximum Aggregateable Prefixes: {max_agg_prefixes_count}")
     print(f"Unaggregateables Prefixes: {total_prefijos - max_agg_prefixes_count}")
+
+
+
+    #se divide el total de prefijos unicos anunciado y la cantidad de prefijos luego de aplicar el numero maximo prefijos agregables 
     print(f"Factor de desagregación: {total_prefijos / len(aggregated_networks) if aggregated_networks else 0:.2f}")
 
     df['as_path_length'] = df['as_path'].apply(lambda x: len(clean_as_path(x)))
