@@ -5,6 +5,8 @@ from collections import defaultdict
 
 # Variables
 FILE_PATH = "datos_columnas_filtradas.txt"
+
+
 SEMAPHORE_LIMIT = 200
 semaphore = asyncio.Semaphore(SEMAPHORE_LIMIT)
 asn_cache = {}
