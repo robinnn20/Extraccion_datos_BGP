@@ -173,9 +173,9 @@ async def analyze_ipv6_prefixes(file_path):
         if not registered:
             unregistered_asns[asn] = df[df['origin_as'] == asn]['prefix'].tolist()
 
-   # print("\n🔍 **ASNs NO REGISTRADOS Y SUS PREFIJOS** 🔍")
+   # print("\n ASNs NO REGISTRADOS Y SUS PREFIJOS*")
   #  for asn, prefixes in unregistered_asns.items():
-   #     print(f"ASN {asn} -> {len(prefixes)} prefijos asociados ❌")
+   #     print(f"ASN {asn} -> {len(prefixes)} prefijos asociados ")
 
     print(f"Total de ASNs no registrados: {len(unregistered_asns)}")
     print(f"prefijos de ASNs no registrados: {sum(len(prefixes) for prefixes in unregistered_asns.values())}")
