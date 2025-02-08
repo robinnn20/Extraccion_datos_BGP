@@ -33,9 +33,16 @@ class PatriciaTrie:
 
     def find_supernet_or_contiguous(self, network):
         node = self.root
+        #Convierte la dirección de la red IPv6 (network.network_address) en un número entero, lo convierte a binario y luego lo transforma en una cadena binaria de 128 bits, rellenando con ceros a la izquierda si es necesario.
+        #Esto facilita la comparación bit a bit de las direcciones de red.
         prefix_str = bin(int(network.network_address))[2:].zfill(128)
         supernet_candidate = None
 
+        #Recorre cada bit del prefijo de la red (en formato binario).
+        #Por cada bit, verifica si existe un nodo hijo correspondiente en el Trie:
+            #Si existe, navega a ese nodo hijo y revisa si ese nodo tiene una red (node.network) cuyo prefijo es más corto que el de la red que se está evaluando (node.network.prefixlen < network.prefixlen).
+                #Si cumple con la condición de ser una red más amplia (un posible supernet), se marca como el candidato a supernet (supernet_candidate = node.network).
+            #Si no se encuentra un nodo hijo para el bit actual, el ciclo se interrumpe con break, lo que indica que no se puede seguir buscando en ese camino del Trie.
         for bit in prefix_str:
             if bit in node.children:
                 node = node.children[bit]
@@ -44,10 +51,10 @@ class PatriciaTrie:
             else:
                 break
 
-        if node and node.network:
-            next_prefix = network.network_address + (1 << (128 - network.prefixlen))
-            if node.network.network_address == next_prefix:
-                return node.network
+      #  if node and node.network:
+       #     next_prefix = network.network_address + (1 << (128 - network.prefixlen))
+        #    if node.network.network_address == next_prefix:
+         #       return node.network
 
         return supernet_candidate
 
@@ -60,13 +67,17 @@ class PatriciaTrie:
             node.is_aggregated = True
 
 # Función para verificar si un ASN está registrado
+#La función es asíncrona, lo que permite ejecutar la consulta WHOIS sin bloquear el flujo del programa. El parámetro asn es el número del sistema autónomo que se desea verificar.
 async def is_asn_registered(asn):
-    """Verifica si un ASN está registrado usando WHOIS de forma asíncrona en whois.radb.net."""
+#Antes de realizar una nueva consulta, la función verifica si el resultado de la consulta del ASN ya está almacenado en un caché llamado asn_cache.
+#Si ya se ha consultado previamente, retorna el valor del caché, evitando hacer una consulta innecesaria.
     if asn in asn_cache:
         return asn_cache[asn]
 
     async with semaphore:
         try:
+            #Se crea un proceso asíncrono que ejecuta el comando whois para consultar la base de datos whois.radb.net sobre el ASN proporcionado.
+            #stdout contiene la salida del proceso (la respuesta del servidor WHOIS), y stderr contiene cualquier error o mensaje de advertencia.
             process = await asyncio.create_subprocess_exec(
                 "whois", "-h", "whois.radb.net", f"AS{asn}",
                 stdout=asyncio.subprocess.PIPE,
@@ -80,10 +91,12 @@ async def is_asn_registered(asn):
                 output = stdout.decode('latin-1')
 
             # Expresión regular para detectar respuestas de ASNs no registrados
+            #Se utiliza una expresión regular para buscar términos en la respuesta que indiquen que el ASN no está registrado, como "denied", "not found" o "invalid".
+            #Si se encuentra alguno de estos términos, se marca el ASN como no registrado en el caché (asn_cache) y se devuelve False.
             if re.search(r"(denied|not found|no entries found|error|invalid|does not exist)", output, re.IGNORECASE):
                 asn_cache[asn] = False
                 return False
-
+            #Si no se encuentra ninguna de las respuestas de error, el ASN se considera registrado, se guarda en el caché como True y se retorna True
             asn_cache[asn] = True
             return True
 
@@ -111,15 +124,23 @@ async def analyze_ipv6_prefixes(file_path):
 
     print(f"Total de prefijos únicos: {total_prefijos}")
     print(f"Average Prefix Length: {average_prefix_length:.2f}")
-
+#Se agrupa el DataFrame por la columna origin_as, que contiene el AS de origen.
+#Se inicializan las variables max_agg_prefixes_count para contar el número de prefijos agregados y aggregated_networks para almacenar las redes que se han agregado.
     grouped_as = df.groupby('origin_as')
     max_agg_prefixes_count = 0
     aggregated_networks = set()
 
     for origin_as, group in grouped_as:
+
+        #Se itera sobre cada grupo de AS, ordenando los prefijos del grupo según su longitud (prefixlen) y la dirección de la red (network_address). 
+        #Luego, se inicializa un conjunto aggregated_in_as para almacenar las redes agregadas dentro de ese AS.
         networks = sorted(group['network'].drop_duplicates().tolist(), key=lambda x: (x.prefixlen, x.network_address))
         aggregated_in_as = set()
 
+
+        #Para cada red en el grupo de AS, se busca si existe un supernet o red contigua usando el método find_supernet_or_contiguous del trie.
+        #Si se encuentra una red agregada (un supernet o red contigua),
+        #se incrementa el contador max_agg_prefixes_count, se marca la red como agregada y se añade tanto la red como su supernet o red contigua al conjunto aggregated_in_as
         for i in range(len(networks)):
             network = networks[i]
             if network in aggregated_in_as:
@@ -131,7 +152,8 @@ async def analyze_ipv6_prefixes(file_path):
                 aggregated_in_as.add(network)
                 trie.mark_as_aggregated(network)
                 aggregated_in_as.add(supernet_or_contiguous)
-
+    #se filtran las redes dentro del conjunto aggregated_in_as para asegurarse de que no haya ninguna red más específica (con mayor longitud de prefijo) que sea igual en dirección de red. 
+    #Las redes que cumplen este criterio se añaden al conjunto aggregated_networks.
         for network in aggregated_in_as:
             if not any(other_network.prefixlen > network.prefixlen and other_network.network_address == network.network_address for other_network in aggregated_in_as):
                 aggregated_networks.add(network)
