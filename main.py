@@ -27,12 +27,12 @@ def obtener_archivo_rib_mas_reciente():
     """Obtiene el archivo RIB más reciente desde la URL dada."""
     response = requests.get(BASE_URL)
     if response.status_code != 200:
-        log("❌ Error al acceder a la página de archivos RIB.")
+        log(" Error al acceder a la página de archivos RIB.")
         return None
 
     archivos_rib = re.findall(r'(rib\.\d{8}\.\d{4}\.bz2)', response.text)
     if not archivos_rib:
-        log("❌ No se encontraron archivos RIB.")
+        log(" No se encontraron archivos RIB.")
         return None
     
     archivo_rib = sorted(archivos_rib, reverse=True)[0]
@@ -41,13 +41,13 @@ def obtener_archivo_rib_mas_reciente():
 
 def descargar_archivo(url, save_path):
     """Descarga un archivo desde una URL dada y lo guarda en save_path."""
-    log(f"⬇️ Descargando archivo desde {url} ...")
+    log(f"⬇ Descargando archivo desde {url} ...")
     response = requests.get(url, stream=True)
     if response.status_code == 200:
         with open(save_path, 'wb') as f:
             for chunk in response.iter_content(chunk_size=1024):
                 f.write(chunk)
-        log("✅ Descarga completada.")
+        log(" Descarga completada.")
         return True
     else:
         log("❌ Error al descargar el archivo.")
@@ -57,10 +57,10 @@ def ejecutar_script(comando):
     """Ejecuta un script de Python y retorna su salida."""
     try:
         resultado = subprocess.run(comando, text=True, capture_output=True, check=True)
-        log(f"✅ {comando[1]} ejecutado correctamente.")
+        log(f" {comando[1]} ejecutado correctamente.")
         return resultado.stdout  # Devolvemos la salida del script
     except subprocess.CalledProcessError as e:
-        log(f"❌ Error ejecutando {comando[1]}: {e}")
+        log(f" Error ejecutando {comando[1]}: {e}")
         return None
 
 def enviar_correo(asunto, mensaje):
@@ -79,9 +79,9 @@ def enviar_correo(asunto, mensaje):
         server.sendmail(SMTP_USER, DESTINATARIO, msg.as_string())
         server.quit()
 
-        log("✅ Correo enviado correctamente.")
+        log(" Correo enviado correctamente.")
     except Exception as e:
-        log(f"❌ Error al enviar el correo: {e}")
+        log(f" Error al enviar el correo: {e}")
 
 def limpiar_archivos():
     """Elimina los archivos temporales generados."""
