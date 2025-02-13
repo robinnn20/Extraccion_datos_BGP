@@ -99,7 +99,7 @@ def log(mensaje):
 url_rib = obtener_archivo_rib_mas_reciente()
 if url_rib and descargar_archivo(url_rib, SAVE_PATH):
     # Ejecutar bgpdump
-    log("⚙️ Procesando con bgpdump...")
+    log("Procesando con bgpdump...")
     result = subprocess.run(["bgpdump", "-m", SAVE_PATH, "-O", RIB_OUTPUT_FILE])
 
     if result.returncode == 0:  
