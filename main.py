@@ -50,7 +50,7 @@ def descargar_archivo(url, save_path):
         log(" Descarga completada.")
         return True
     else:
-        log("❌ Error al descargar el archivo.")
+        log(" Error al descargar el archivo.")
         return False
 
 def ejecutar_script(comando):
