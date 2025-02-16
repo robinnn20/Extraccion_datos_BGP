@@ -132,7 +132,7 @@ async def analyze_ipv6_prefixes(file_path):
     total_prefix_length = sum(network.prefixlen for network in df['network'].drop_duplicates())
     average_prefix_length = total_prefix_length / total_prefijos if total_prefijos else 0
 
-    print(f"Total de prefijos únicos: {total_prefijos}")
+    print(f"Total prefixes: {total_prefijos}")
     print(f"Average Prefix Length: {average_prefix_length:.2f}")
 
     grouped_as = df.groupby('origin_as')
@@ -177,8 +177,8 @@ async def analyze_ipv6_prefixes(file_path):
         if not registered:
             unregistered_asns[asn] = df[df['origin_as'] == asn]['prefix'].tolist()
 
-    print(f"Total de ASNs no registrados: {len(unregistered_asns)}")
-    print(f"Prefijos de ASNs no registrados: {sum(len(prefixes) for prefixes in unregistered_asns.values())}")
+    print(f"Total unregistered ASNs: {len(unregistered_asns)}")
+    print(f"Prefixes from unregistered ASNs in the Routing Table: {sum(len(prefixes) for prefixes in unregistered_asns.values())}")
 
 # Ejecutar el análisis asíncrono
 asyncio.run(analyze_ipv6_prefixes(FILE_PATH))
