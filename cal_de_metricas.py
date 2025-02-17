@@ -94,7 +94,7 @@ async def is_asn_registered(asn):
                     output = stdout.decode('latin-1')
 
                 # Expresión regular para detectar ASNs no registrados
-                unregistered_pattern = re.compile(r"(denied|not match|not found|error|no entries found|invalid)", re.IGNORECASE)
+                unregistered_pattern = re.compile(r"(denied|not match|not found|ERROR|no entries found|invalid)", re.IGNORECASE)
                 registered = not bool(unregistered_pattern.search(output))
 
                 asn_cache[asn] = registered
