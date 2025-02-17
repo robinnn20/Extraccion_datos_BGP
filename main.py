@@ -109,7 +109,7 @@ if url_rib and descargar_archivo(url_rib, SAVE_PATH):
         ejecutar_script(["python3", "filtrar_columnas.py"])
         
         # Ejecutar d.py y capturar salida
-        salida_d = ejecutar_script(["python3", "calculos_de_metricas.py"])
+        salida_d = ejecutar_script(["python3", "calc_de_metricas.py"])
         
         if salida_d:
             # Enviar correo con las métricas
