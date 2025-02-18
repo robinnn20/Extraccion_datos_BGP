@@ -114,7 +114,12 @@ if url_rib and descargar_archivo(url_rib, SAVE_PATH):
             # Enviar correo con las métricas
             semana_actual = datetime.now().isocalendar()[1]  # Obtener la semana del año
             asunto = f"Summary BGP IPv6"
-            mensaje = f"Este correo es automatico se Adjunta la informacion de las  métricas BGP IPv6 obtenidas de esta semana:\n\n{salida_d}"
+            mensaje = f"Este correo es automático. Se adjunta la información de las métricas BGP IPv6 obtenidas esta semana:\n\n" \
+          f"Analysis Summary\n" \
+          f"----------------\n" \
+          f"{salida_d}\n" \
+          f"----------------"
+
             enviar_correo(asunto, mensaje)
         
         # Limpiar archivos temporales
