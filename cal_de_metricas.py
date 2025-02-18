@@ -46,9 +46,15 @@ class PatriciaTrie:
 
     def find_supernet_or_contiguous(self, network):
         node = self.root
+    #Convierte la dirección de la red IPv6 (network.network_address) en un número entero, lo convierte a binario y luego lo transforma en una cadena binaria de 128 bits, rellenando con ceros a la izquierda si es necesario.
+    #Esto facilita la comparación bit a bit de las direcciones de red.
         prefix_str = bin(int(network.network_address))[2:].zfill(128)
         supernet_candidate = None
-
+#Recorre cada bit del prefijo de la red (en formato binario).
+        #Por cada bit, verifica si existe un nodo hijo correspondiente en el Trie:
+            #Si existe, navega a ese nodo hijo y revisa si ese nodo tiene una red (node.network) cuyo prefijo es más corto que el de la red que se está evaluando (node.network.prefixlen < network.prefixlen).
+                #Si cumple con la condición de ser una red más amplia (un posible supernet), se marca como el candidato a supernet (supernet_candidate = node.network).
+            #Si no se encuentra un nodo hijo para el bit actual, el ciclo se interrumpe con break, lo que indica que no se puede seguir buscando en ese camino del Trie.
         for bit in prefix_str:
             if bit in node.children:
                 node = node.children[bit]
@@ -71,10 +77,12 @@ class PatriciaTrie:
             node = node.children[bit]
         if node.network == network:
             node.is_aggregated = True
+# Función para verificar si un ASN está registrado
+#La función es asíncrona, lo que permite ejecutar la consulta WHOIS sin bloquear el flujo del programa. El parámetro asn es el número del sistema autónomo que se desea verificar.
 
-# Función para verificar si un ASN está registrado con reintentos
 async def is_asn_registered(asn):
-    """Verifica si un ASN está registrado usando WHOIS de RADB con reintentos."""
+#Antes de realizar una nueva consulta, la función verifica si el resultado de la consulta del ASN ya está almacenado en un caché llamado asn_cache.
+#Si ya se ha consultado previamente, retorna el valor del caché, evitando hacer una consulta innecesaria.
     if asn in asn_cache:
         return asn_cache[asn]
 
