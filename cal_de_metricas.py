@@ -9,7 +9,7 @@ from collections import defaultdict
 
 # Variables
 FILE_PATH = "datos_columnas_filtradas.txt"
-SEMAPHORE_LIMIT = 50  # Reducido para evitar bloqueos en whois
+SEMAPHORE_LIMIT = 90  # Reducido para evitar bloqueos en whois
 semaphore = asyncio.Semaphore(SEMAPHORE_LIMIT)
 CACHE_FILE = "asn_cache.json"
 
