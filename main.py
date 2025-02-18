@@ -9,9 +9,9 @@ from email.mime.multipart import MIMEMultipart
 
 # Configuración del correo
 SMTP_SERVER = "smtp.gmail.com"  # Servidor SMTP de Gmail
-SMTP_PORT = 587  # Puerto para STARTTLS
-SMTP_USER = "informacioon.semanal@gmail.com"  # Tu correo (cambiar)
-SMTP_PASS = "qllz hwrw yxxc qmgp"  # Tu contraseña (cambiar)
+SMTP_PORT = 587 
+SMTP_USER = "informacioon.semanal@gmail.com"  # Correo creado especificamente para enviar las metricas
+SMTP_PASS = "qllz hwrw yxxc qmgp"  
 DESTINATARIO = "robinhidalgo169@gmail.com"  # Destinatario del correo
 
 # Ruta de archivos
@@ -85,7 +85,7 @@ def enviar_correo(asunto, mensaje):
 
 def limpiar_archivos():
     """Elimina los archivos temporales generados."""
-    for archivo in [RIB_OUTPUT_FILE, FILTERED_OUTPUT_FILE]:
+    for archivo in [RIB_OUTPUT_FILE, FILTERED_OUTPUT_FILE, 'rib_latest.bz2', 'asn_cache_json']:
         if os.path.exists(archivo):
             os.remove(archivo)
             log(f"🗑️ Archivo {archivo} eliminado.")
@@ -108,7 +108,6 @@ if url_rib and descargar_archivo(url_rib, SAVE_PATH):
         # Ejecutar filtrar_columnas.py
         ejecutar_script(["python3", "filtrar_columnas.py"])
         
-        # Ejecutar d.py y capturar salida
         salida_d = ejecutar_script(["python3", "cal_de_metricas.py"])
         
         if salida_d:
