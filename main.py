@@ -15,16 +15,19 @@ SMTP_PASS = "qllz hwrw yxxc qmgp"
 DESTINATARIO = "robinhidalgo169@gmail.com"  # Destinatario del correo
 
 # Ruta de archivos
+#nombre de archivo que se utilizara para el archivo RIB mas reciente
 SAVE_PATH = "rib_latest.bz2"
+#nombre del archivo luego de aplicar el bgpdump
 RIB_OUTPUT_FILE = "datos_rib.txt"
+#nombre del rachivo luego de aplicar el filtro de columnas y quedar con solo 2 columnas
 FILTERED_OUTPUT_FILE = "datos_columnas_filtradas.txt"
+#nombre del archivo de los logs
 LOG_PATH = "ejecucion.log"
 
 # URL base de Route Views Chile
 BASE_URL = "https://routeviews.org/route-views.chile/bgpdata/2025.02/RIBS/"
 
 def obtener_archivo_rib_mas_reciente():
-    """Obtiene el archivo RIB más reciente desde la URL dada."""
     response = requests.get(BASE_URL)
     if response.status_code != 200:
         log(" Error al acceder a la página de archivos RIB.")
@@ -39,9 +42,12 @@ def obtener_archivo_rib_mas_reciente():
     
     return f"{BASE_URL}{archivo_rib}"
 
+
+#funcion para descargar archivo rib
+#toma como parametros la url y el nombre com osera guardado
 def descargar_archivo(url, save_path):
-    """Descarga un archivo desde una URL dada y lo guarda en save_path."""
     log(f"⬇ Descargando archivo desde {url} ...")
+    #se hace la consulta para ver si se puede descargar  
     response = requests.get(url, stream=True)
     if response.status_code == 200:
         with open(save_path, 'wb') as f:
@@ -54,7 +60,6 @@ def descargar_archivo(url, save_path):
         return False
 
 def ejecutar_script(comando):
-    """Ejecuta un script de Python y retorna su salida."""
     try:
         resultado = subprocess.run(comando, text=True, capture_output=True, check=True)
         log(f" {comando[1]} ejecutado correctamente.")
@@ -62,9 +67,8 @@ def ejecutar_script(comando):
     except subprocess.CalledProcessError as e:
         log(f" Error ejecutando {comando[1]}: {e}")
         return None
-
+#funcion para enviar correo
 def enviar_correo(asunto, mensaje):
-    """Envía un correo con las métricas obtenidas."""
     try:
         msg = MIMEMultipart()
         msg["From"] = SMTP_USER
@@ -83,15 +87,15 @@ def enviar_correo(asunto, mensaje):
     except Exception as e:
         log(f" Error al enviar el correo: {e}")
 
+
+#funcion que encuentra y elimina los archivos segun sus nombres para evitar uso de espacio innecesario luego de terminar el proceso 
 def limpiar_archivos():
-    """Elimina los archivos temporales generados."""
     for archivo in [RIB_OUTPUT_FILE, FILTERED_OUTPUT_FILE, 'rib_latest.bz2', 'asn_cache_json']:
         if os.path.exists(archivo):
             os.remove(archivo)
-            log(f"🗑️ Archivo {archivo} eliminado.")
+            log(f"Archivo {archivo} eliminado.")
 
 def log(mensaje):
-    """Registra un mensaje con la fecha y hora en el archivo de log."""
     with open(LOG_PATH, "a") as f:
         f.write(f"{datetime.now()} - {mensaje}\n")
 
