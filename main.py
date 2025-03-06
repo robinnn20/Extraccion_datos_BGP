@@ -25,22 +25,50 @@ FILTERED_OUTPUT_FILE = "datos_columnas_filtradas.txt"
 LOG_PATH = "ejecucion.log"
 
 # URL base de Route Views Chile
-BASE_URL = "https://routeviews.org/route-views.chile/bgpdata/2025.02/RIBS/"
+#BASE_URL = "https://routeviews.org/route-views.chile/bgpdata/2025.02/RIBS/"
+
+#def obtener_archivo_rib_mas_reciente():
+ #   response = requests.get(BASE_URL)
+  #  if response.status_code != 200:
+   #     log(" Error al acceder a la página de archivos RIB.")
+    #    return None
+
+   # archivos_rib = re.findall(r'(rib\.\d{8}\.\d{4}\.bz2)', response.text)
+   # if not archivos_rib:
+    #    log(" No se encontraron archivos RIB.")
+    #    return None
+    
+  #  archivo_rib = sorted(archivos_rib, reverse=True)[0]
+    
+  #  return f"{BASE_URL}{archivo_rib}"
+
 
 def obtener_archivo_rib_mas_reciente():
-    response = requests.get(BASE_URL)
+    # Obtener el año y mes actual
+    ahora = datetime.utcnow()
+    año_mes_actual = ahora.strftime("%Y.%m")
+    
+    # Construir la URL dinámica
+    base_url = f"https://routeviews.org/route-views.chile/bgpdata/{año_mes_actual}/RIBS/"
+    
+    response = requests.get(base_url)
+    
     if response.status_code != 200:
-        log(" Error al acceder a la página de archivos RIB.")
+        log("Error al acceder a la página de archivos RIB.")
         return None
 
+    # Buscar archivos RIB en la página
     archivos_rib = re.findall(r'(rib\.\d{8}\.\d{4}\.bz2)', response.text)
+    
     if not archivos_rib:
-        log(" No se encontraron archivos RIB.")
+        log("No se encontraron archivos RIB.")
         return None
     
+    # Obtener el archivo más reciente
     archivo_rib = sorted(archivos_rib, reverse=True)[0]
     
-    return f"{BASE_URL}{archivo_rib}"
+    return f"{base_url}{archivo_rib}"
+
 
 
 #funcion para descargar archivo rib
